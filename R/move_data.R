@@ -1,0 +1,12 @@
+names=list=c("countries",
+             "wd_events",
+             "wp_pages_curation",
+             "wp_segments",
+             "wp_revisions",
+             "wm_map")
+move_rds=function(name,dir,new_dir){
+  path=glue::glue("{dir}/{name}.RDS")
+  newpath=glue::glue("{new_dir}/{name}.RDS")
+  file.copy(from=path,to=newpath)
+}
+purrr::walk(names,dir="../glourb_floods/data",new_dir="data",move_rds)
