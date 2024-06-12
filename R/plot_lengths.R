@@ -9,7 +9,8 @@ plot_lengths=function(flood_id){
     theme(#axis.text.x = element_blank(),
           #axis.ticks.x = element_blank(),
           legend.position="none")+
-    xlab(" ")+
-    scale_x_continuous(breaks=1,labels=" ")
+    xlab(" ")+ylab("n_segments")+
+    scale_x_continuous(breaks=1,labels=" ")+
+    scale_fill_manual(values=c(col_DFO,col_WD))
   p
 }

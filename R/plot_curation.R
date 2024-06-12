@@ -8,5 +8,6 @@ plot_curation=function(flood_id){
     scale_y_continuous(limits=c(-1,1), breaks=c(-1,0,1))+
     scale_x_continuous(breaks=1,labels=" ")+
     xlab(" ")+
-    theme(legend.position="none")
+    theme(legend.position="none")+
+    scale_color_manual(values=c(col_DFO,col_WD))
 }

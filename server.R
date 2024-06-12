@@ -12,28 +12,35 @@ library(shiny)
 # Define server logic required to draw a histogram
 function(input, output, session) {
   
+    r_flood_selected=reactive({
+      id=wd_events$flood[input$global_table_rows_selected]
+      if(is.null(input$global_table_rows_selected)){id="wd:Q14628797"}
+      print(id)
+      id
+    })
+  
     nlangs=reactive({
       wp_pages %>%
-        filter(flood==input$flood) %>% 
+        filter(flood==r_flood_selected()) %>% 
         pull(lang) %>%
         unique() %>% 
         length()
     })
     output$flood_info=renderUI({
       tib_flood=wd_events %>%
-        filter(flood==input$flood) 
+        filter(flood==r_flood_selected()) 
       tib_country=countries %>% filter(country %in% tib_flood$country) %>% 
         mutate(country=purrr::map2_chr(country,HDI,
                                        ~paste0(.x," (",.y,")"))) %>% 
-        mutate(language=purrr::map2_chr(language,language_code,
-                                        ~paste0(.x," (",.y,")"))) %>% 
-        summarise(country=paste0(unique(country_label),collapse=", "),
-                  language=paste0(unique(language),collapse=", "))
-      tagList(
-        HTML(glue::glue("<b>Label:</b> {unique(tib_flood$flood_label)}<br>")),
-        HTML(glue::glue("<b>Date:</b> {unique(tib_flood$date)}<br>")),
-        HTML(glue::glue("<b>Country:</b> {tib_country$country}<br>")),
-        HTML(glue::glue("<b>Local language:</b> {tib_country$language} <br>"))
+        summarise(country=paste0(unique(country_label),collapse=", "))
+      result=fluidRow(column(width=6,
+                      HTML(paste0("📍 You have selected the event <b>",r_flood_selected(),"</b>"))
+                      ),
+                      column(width=6,
+                             HTML(glue::glue("<b>Label:</b> {unique(tib_flood$flood_label)}<br>")),
+                             HTML(glue::glue("<b>Date:</b> {unique(tib_flood$date)}<br>")),
+                             HTML(glue::glue("<b>Country:</b> {tib_country$country}<br>"))
+                             )
       )        
     })
     #####################################
@@ -41,7 +48,7 @@ function(input, output, session) {
       plot(legend_class_name)
     },width=100,height=140)
     output$classif=renderPlotly({
-      p=plot_segment_class(input$flood)
+      p=plot_segment_class(r_flood_selected())
       ggplotly(p,
                height=100+nlangs()*100)
     })
@@ -50,32 +57,25 @@ function(input, output, session) {
       plot(legend_local)
     },width=100,height=140)
     output$lengths=renderPlotly({
-      p=plot_lengths(input$flood)
+      p=plot_lengths(r_flood_selected())
       ggplotly(p,
                height=100+nlangs()*100)
     })
-    output$articles_history=renderPlotly({
-      p=plot_history_revisions(input$flood)
+    output$views_and_revisions=renderPlotly({
+      p=plot_views_and_revisions(r_flood_selected())
       ggplotly(p,
                height=100+nlangs()*100)
     })
-    output$views_history=renderPlotly({
-      p=plot_history_views(input$flood)
-      ggplotly(p,
-               height=100+nlangs()*100)
-    })
-    output$global_table <- DT::renderDataTable({
-      tablename=stringr::str_replace(input$global_table,"^..","")
-      print(tablename)
-      table=get(tablename)
-      result=prepare_table(table)
+    output$global_table <- DT::renderDT({
+      table=wd_events
+      result=prepare_table(table,selection="single")
       result
     })
-    output$event_table <- DT::renderDataTable({
+    output$event_table <- DT::renderDT({
       tablename=stringr::str_replace(input$event_table,"^..","")
-      print(tablename)
       table=get(tablename) %>% 
-        filter(flood==input$flood)
+        filter(flood==r_flood_selected()) %>% 
+        select(-flood)
       if("textt" %in% colnames(table)){
         if(!input$show_textt){
           table=table %>% select(-textt)
@@ -83,14 +83,20 @@ function(input, output, session) {
       }
       result=prepare_table(table)
       result
+      })
+    output$add_table <- DT::renderDT({
+      tablename=stringr::str_replace(input$add_table,"^..","")
+      table=get(tablename)
+      result=prepare_table(table)
+      result
     })
     output$curation=renderPlotly({
-      p=plot_curation(input$flood)
+      p=plot_curation(r_flood_selected())
       ggplotly(p,
                height=100+nlangs()*100)
     })
     output$editors=renderPlotly({
-      p=plot_editors(input$flood,input$editors_metric)
+      p=plot_editors(r_flood_selected(),input$editors_metric)
       ggplotly(p,
                height=100+nlangs()*100)
     })

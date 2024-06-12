@@ -1,18 +1,27 @@
 .limited-height {
-    max-height: 80px; /* Change the height value as needed */
-    overflow-y: auto; /* Add scrollbar if content exceeds the height */
+    max-height: 150px; /* Change the height value as needed */
+    /* overflow-y: auto; Add scrollbar if content exceeds the height */
 }
   
 /* Target the tab titles in the navlistPanel */
 .nav-pills > li > a {
-  writing-mode: vertical-lr;/*  Set text orientation to vertical right-to-left */
-  transform: rotate(180deg); /*  Rotate the text to make it readable */
+  /*writing-mode: vertical-lr;/*  Set text orientation to vertical right-to-left */
+  /*transform: rotate(180deg); /*  Rotate the text to make it readable */
   padding-left: 5px;
   padding-right: 5px;
-  /*background-color: pink; /* Change background color */
-  color: black; /* Change text color */
+  background-color: #F2C5C5; /* Change background color */
+  color: black#; /* Change text color */
 }
 
+
+.navbar-brand{
+  height:150px; /*Add bottom margin under image in navlistPanel */
+  text-align: left;
+}
+
+.well{
+  background-color: #CAEBD9;
+}
 .nav-stacked > li > a {
   margin-right: 5px; /* Reduce bottom margin */
 }
